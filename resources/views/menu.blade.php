@@ -7,28 +7,24 @@
     <h1 class="text-center mb-5">Наше меню</h1>
     
     @foreach($menu as $category => $items)
-    <div class="mb-5">
-        <h2 class="text-center mb-4" style="color: #8B4513;">{{ $category }}</h2>
-        <div class="row">
-            @foreach($items as $item)
-            <div class="col-md-6">
-                <div class="card mb-3">
-                    <div class="row g-0">
-                        <div class="col-md-4">
-                            <img src="https://images.unsplash.com/photo-1544025162-d76694265947?w=200" class="img-fluid rounded-start" style="height: 100%; object-fit: cover;" alt="Блюдо">
-                        </div>
-                        <div class="col-md-8">
-                            <div class="card-body">
-                                <h5 class="card-title">{{ $item->name }}</h5>
-                                <p class="card-text">{{ $item->description }}</p>
-                                <p class="price">{{ $item->price }} ₽</p>
-                            </div>
-                        </div>
-                    </div>
+    <h2 class="mb-4">{{ $category }}</h2>
+    <div class="row mb-5">
+        @foreach($items as $item)
+        <div class="col-md-4 mb-4">
+            <div class="card h-100">
+                @if($item->image)
+                    <img src="/uploads/menu/{{ $item->image }}" class="card-img-top" alt="{{ $item->name }}" style="height: 200px; object-fit: cover;">
+                @else
+                    <img src="https://via.placeholder.com/300x200?text=Ресторан" class="card-img-top" alt="Ресторан" style="height: 200px; object-fit: cover;">
+                @endif
+                <div class="card-body">
+                    <h5 class="card-title">{{ $item->name }}</h5>
+                    <p class="card-text">{{ $item->description }}</p>
+                    <p class="fw-bold text-primary">{{ $item->price }} ₽</p>
                 </div>
             </div>
-            @endforeach
         </div>
+        @endforeach
     </div>
     @endforeach
 </div>
