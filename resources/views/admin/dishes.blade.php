@@ -11,10 +11,24 @@
         </a>
     </div>
     
+    @if(session('success'))
+        <div class="alert alert-success alert-dismissible fade show" role="alert">
+            {{ session('success') }}
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+    @endif
+    
+    @if(session('error'))
+        <div class="alert alert-danger alert-dismissible fade show" role="alert">
+            {{ session('error') }}
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+    @endif
+    
     <div class="card">
         <div class="card-body">
-            <table class="table table-bordered">
-                <thead>
+            <table class="table table-bordered table-hover">
+                <thead class="table-dark">
                     <tr>
                         <th>ID</th>
                         <th>Фото</th>
@@ -37,12 +51,21 @@
                             @endif
                         </td>
                         <td>{{ $item->name }}</td>
-                        <td>{{ $item->description }}</td>
+                        <td>{{ Str::limit($item->description, 50) }}</td>
                         <td>{{ $item->price }} ₽</td>
                         <td>{{ $item->category }}</td>
                         <td>
-                            <a href="{{ route('admin.dishes.edit', $item->id) }}" class="btn btn-sm btn-warning">✏️</a>
-                            <a href="{{ route('admin.dishes.delete', $item->id) }}" class="btn btn-sm btn-danger" onclick="return confirm('Удалить блюдо?')">❌</a>
+                            <a href="{{ route('admin.dishes.edit', $item->id) }}" class="btn btn-sm btn-warning" title="Редактировать">
+                                <i class="fas fa-edit"></i>
+                            </a>
+                            
+                            <form method="POST" action="{{ route('admin.dishes.delete', $item->id) }}" style="display: inline;" onsubmit="return confirm('Вы уверены, что хотите удалить блюдо "{{ $item->name }}"?')">
+                                @csrf
+                                <input type="hidden" name="token" value="{{ md5($item->id . session('user_id') . config('app.key')) }}">
+                                <button type="submit" class="btn btn-sm btn-danger" title="Удалить">
+                                    <i class="fas fa-trash"></i>
+                                </button>
+                            </form>
                         </td>
                     </tr>
                     @endforeach

@@ -5,17 +5,30 @@
 @section('content')
 <div class="container my-5">
     <div class="d-flex justify-content-between align-items-center mb-4">
-        <h1>Управление бронированиями</h1>
-        <a href="{{ route('admin.dishes') }}" class="btn btn-primary">📋 К блюдам</a>
+        <h1>Управление бронями</h1>
+        <a href="{{ route('admin.dishes') }}" class="btn btn-primary">
+            <i class="fas fa-arrow-left"></i> К блюдам
+        </a>
     </div>
     
-    <div class="card">
-        <div class="card-header bg-dark text-white">
-            <h5 class="mb-0">Список всех броней</h5>
+    @if(session('success'))
+        <div class="alert alert-success alert-dismissible fade show" role="alert">
+            {{ session('success') }}
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
         </div>
+    @endif
+    
+    @if(session('error'))
+        <div class="alert alert-danger alert-dismissible fade show" role="alert">
+            {{ session('error') }}
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+    @endif
+    
+    <div class="card">
         <div class="card-body">
             <div class="table-responsive">
-                <table class="table table-bordered table-striped">
+                <table class="table table-bordered table-hover">
                     <thead class="table-dark">
                         <tr>
                             <th>ID</th>
@@ -30,7 +43,7 @@
                         </tr>
                     </thead>
                     <tbody>
-                        @foreach($reservations as $r)
+                        @forelse($reservations as $r)
                         <tr>
                             <td>{{ $r->id }}</td>
                             <td>{{ $r->name }}</td>
@@ -41,7 +54,7 @@
                             <td>{{ $r->guests }}</td>
                             <td>
                                 @if($r->status == 'pending')
-                                    <span class="badge bg-warning">Ожидает</span>
+                                    <span class="badge bg-warning text-dark">Ожидает</span>
                                 @elseif($r->status == 'confirmed')
                                     <span class="badge bg-success">Подтверждено</span>
                                 @elseif($r->status == 'cancelled')
@@ -51,13 +64,26 @@
                                 @endif
                             </td>
                             <td>
-                                <a href="{{ route('admin.reservations.edit', $r->id) }}" class="btn btn-warning btn-sm">✏️ Ред.</a>
-                                <a href="{{ route('admin.reservations.delete', $r->id) }}" 
-                                   class="btn btn-danger btn-sm" 
-                                   onclick="return confirm('Удалить бронь?')">❌ Уд.</a>
+                                <a href="{{ route('admin.reservations.edit', $r->id) }}" class="btn btn-sm btn-warning" title="Редактировать">
+                                    <i class="fas fa-edit"></i>
+                                </a>
+                                
+                                <form method="POST" action="{{ route('admin.reservations.delete', $r->id) }}" style="display: inline;" onsubmit="return confirm('Вы уверены, что хотите удалить бронь #{{ $r->id }}?')">
+                                    @csrf
+                                    <input type="hidden" name="token" value="{{ md5($r->id . session('user_id') . config('app.key')) }}">
+                                    <button type="submit" class="btn btn-sm btn-danger" title="Удалить">
+                                        <i class="fas fa-trash"></i>
+                                    </button>
+                                </form>
                             </td>
                         </tr>
-                        @endforeach
+                        @empty
+                        <tr>
+                            <td colspan="9" class="text-center py-4">
+                                <p class="text-muted mb-0">Брони пока отсутствуют</p>
+                            </td>
+                        </tr>
+                        @endforelse
                     </tbody>
                 </table>
             </div>
